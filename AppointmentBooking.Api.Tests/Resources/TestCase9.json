@@ -1,0 +1,9 @@
+{
+  "Item1": {
+    "date": "2024-05-04",
+    "products": ["SolarPanels"],
+    "language": "German",
+    "rating": "Gold"
+  },
+  "Item2": []
+}

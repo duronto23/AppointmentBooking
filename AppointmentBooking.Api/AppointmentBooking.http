@@ -1,0 +1,12 @@
+@AppointmentBooking_HostAddress = http://localhost:3000
+
+GET {{AppointmentBooking_HostAddress}}/calendar/query
+Accept: application/json
+
+{
+    "date": "2025-05-03",
+    "products": ["SolarPanels", "Heatpumps"],
+    "language": "German",
+    "rating": "Gold"
+}
+###

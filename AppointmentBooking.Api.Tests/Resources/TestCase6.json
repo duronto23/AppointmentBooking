@@ -1,0 +1,11 @@
+{
+  "Item1": {
+    "date": "2024-05-04",
+    "products": ["SolarPanels"],
+    "language": "German",
+    "rating": "Bronze"
+  },
+  "Item2": [
+    { "start_date": "2024-05-04T10:30:00.000Z", "available_count": 1 }
+  ]
+}
