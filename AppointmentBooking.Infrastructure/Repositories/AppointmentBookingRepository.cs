@@ -29,12 +29,4 @@ public class AppointmentBookingRepository : IAppointmentBookingRepository
         
         return await availableSlots.ToListAsync();
     }
-    
-    // public async Task<List<SlotEntity>> GetSlotEntitiesAsync1(DateTime date, string language, string rating, string[] products)
-    // {
-    //     return await _dbContext.Slots.Include(s => s.SalesManager).Where(slot =>
-    //         slot.StartDate.Date == date && slot.SalesManager.Languages.Any(l => EF.Functions.ILike(l, language)) &&
-    //         slot.SalesManager.CustomerRatings.Any(r => EF.Functions.ILike(r, rating)) &&
-    //         products.All(pr => slot.SalesManager.Products.Any(p => EF.Functions.ILike(p, pr)))).ToListAsync();
-    // }
 }

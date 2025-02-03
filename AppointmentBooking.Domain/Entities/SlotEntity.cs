@@ -8,15 +8,15 @@ public class SlotEntity
 {
     [Key]
     [Column("id")]
-    public long Id { get; set; }
+    public long Id { get; init; }
     [Column("start_date")]
-    public DateTime StartDate { get; set; }
+    public DateTime StartDate { get; init; }
     [Column("end_date")]
-    public DateTime EndDate { get; set; }
+    public DateTime EndDate { get; init; }
     [Column("booked")]
-    public bool Booked { get; set; }
+    public bool Booked { get; init; }
     [ForeignKey(nameof(SalesManagerEntity))]
     [Column("sales_manager_id")]
-    public long SalesManagerId { get; set; }
-    public virtual SalesManagerEntity SalesManager { get; set; }
+    public long SalesManagerId { get; init; }
+    public virtual SalesManagerEntity SalesManager { get; init; }
 }

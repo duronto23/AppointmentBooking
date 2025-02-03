@@ -22,7 +22,7 @@ public class CalendarControllerTests
     [TestCase("./Resources/TestCase9.json", TestName = "Tuesday 2024-05-04, SolarPanels, German and Gold customer. No available slot.")]
     public async Task QueryAppointments_Response_ShouldMatch(string testCaseFilePath)
     {
-        // Arange
+        // Arrange
         var (request, expectedResponse) = JsonSerializer.Deserialize<Tuple<AppointmentBookingRequest, List<SlotModel>>>(await File.ReadAllTextAsync(testCaseFilePath));
         var factory = new WebApplicationFactory<Program>();
         using var client = factory.CreateDefaultClient();

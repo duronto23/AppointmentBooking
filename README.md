@@ -27,7 +27,7 @@ for a customer.
 
 Design and implement a REST endpoint that:
 * Listens for POST requests on this route: `http://localhost:3000/calendar/query`
-* Connects to the provided Postgres database instance 
+* Connects to the provided **Postgres database** instance 
 * Receives a request body in this format:
 ```json
 {
@@ -118,11 +118,21 @@ The project implements one main feature: **querying available time slots for app
 
 ---
 ### **Database & Optimization**
-- The application uses **PostgreSQL** as the database.
+- The application uses **PostgreSQL** as the database as mentioned in requirement.
 - **EF Core with LINQ queries** is used for querying sales managers and available slots.
 - To optimize performance:
-  - **Indexes** are added on relevant columns (e.g., `start_date`, `booked`, `sales_manager_id`).
-  - **GIN indexes** are used for array-based filtering (`languages`, `customer_ratings`, `products`).
+  - **Indexes** are added on relevant columns.
+  - **GIN indexes** are used for array-based filtering.
+- Details of added indexes are as follows:
+
+|Table	| Index	| Columns            | Type	  | Purpose                                                                   |
+|-------|-------|--------------------|--------|---------------------------------------------------------------------------|
+| sales_managers | 	idx_sales_managers_languages | language           | 	GIN	  | Enables efficient filtering of sales managers based on spoken languages.  |
+|sales_managers   |	idx_sales_managers_ratings	| customer_ratings   | GIN	   | Optimizes searches for sales managers based on internal customer ratings.                        |
+|sales_managers	|idx_sales_managers_products	| products           | GIN	   | Improves queries that filter sales managers by the products they handle.                         |
+|slots|	idx_slots_start_date_booked| start_date, booked | B-tree | 	Speeds up queries that filter available slots (booked = false) on a specific date (start_date). |
+|slots|	idx_slots_sales_manager_id| sales_manager_id   | B-tree | 	Enhances performance for joins between slots and sales_managers using sales_manager_id.       |
+|slots|	idx_slots_start_end| start_date, end_date | B-tree | 	Improves efficiency when checking for slot overlaps by indexing both start_date and end_date. |
 
 ---
 ### **Testing**
