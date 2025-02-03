@@ -24,8 +24,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "documents", "documents", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "database", "database", "{C760E41B-739C-47E0-861B-2DFFDEC77F44}"
 	ProjectSection(SolutionItems) = preProject
-		Dockerfile = Dockerfile
-		init.sql = init.sql
+		database\Dockerfile = database\Dockerfile
+		database\init.sql = database\init.sql
 	EndProjectSection
 EndProject
 Global
