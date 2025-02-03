@@ -1,12 +1,12 @@
 # Appointment Booking System
 
+---
 ### Description
 
----
 This project is for the backend of an appointment booking system that allows customers to schedule appointments with sales managers to discuss
 one or more products. Target of this MVP is to have a website that displays available appointment slots that a customer can choose
 from.
-Here in this project, the main focus is to implement the backend for the system with an endpoint that returns the available appointment slots 
+Here in this project, the focus is to implement the backend for the system with an endpoint that returns the available appointment slots 
 for a customer.
 
 **Followings are rules that need to be considered when checking for available appointment slots for a customer:**<br/>
@@ -17,14 +17,14 @@ for a customer.
   * 11:30 - 12:30
 * A sales manager CANNOT be booked for two overlapping slots at the same time. For example, if a sales manger has a slot booked at 10:30 - 11:30, then the 11:00 - 12:00 cannot be booked anymore.
 * Customers are matched to sales managers based on specific criteria. A slot CANNOT be booked by a customer if the sales manager does not match any of these three criteria:
-  * Language. Currently we have 2 possible languages: German, English 
-  * Product(s) to discuss. Currently we have 2 possible products: SolarPanels, Heatpumps 
-  * Internal customer rating. Currently we have 3 possible ratings: Gold, Silver, Bronze.
+  * Language. German, English need to be supported as of now. 
+  * Product(s) to discuss. SolarPanels, Heatpumps are available products as of now.
+  * Internal customer rating. Customer could have Gold, Silver or Bronze rating.
 * Customers can book one appointment to discuss multiple products.
 
+---
 ### Requirements
 
----
 Design and implement a REST endpoint that:
 * Listens for POST requests on this route: `http://localhost:3000/calendar/query`
 * Connects to the provided Postgres database instance 
@@ -52,11 +52,11 @@ Design and implement a REST endpoint that:
 ]
 ```
 
-NOTES: Book appointments is out of scope at this moment. Current focus is to return available slots.
-
-### Database Schema
+NOTES: Appointment booking is out of scope for now. The current focus is on returning available slots based on sales managers' availability and matching criteria.
 
 ---
+### Database Schema
+
 The provided database has the following schema:
 
 **Table: sales_managers**
@@ -83,12 +83,12 @@ The provided database has the following schema:
 
 ---
 ### **Technical Details**
-This project is built using **C# and .NET 8**, following the **Clean Architecture** pattern to maintain separation of concerns and ensure scalability. Used **Entity Framework Core (EF Core)** for database interaction, and the application is structured into four key layers:
+The backend is built using C# and .NET 8 with Entity Framework Core (EF Core) as the ORM. The architecture follows the Clean Architecture pattern, which separates concerns into four layers:
 
-- **API Layer** (`Api`): Contains controllers and exposes endpoints.
-- **Application Layer** (`Application`): Contains business logic and services.
-- **Domain Layer** (`Domain`): Defines core entities.
-- **Infrastructure Layer** (`Infrastructure`): Handles database interactions using **EF Core**.
+- **API Layer** (`Api`) – Exposes endpoints via CalendarController
+- **Application Layer** (`Application`) – Contains business logic and services
+- **Domain Layer** (`Domain`) – Defines core entities
+- **Infrastructure Layer** (`Infrastructure`) – Handles database interactions via AppointmentBookingRepository
 
 ---
 ### **Implementation Details**
@@ -107,6 +107,16 @@ The project implements one main feature: **querying available time slots for app
 **`AppointmentBookingRepository`** – Handles database queries using **Entity Framework Core** to retrieve slot availability efficiently.
 
 ---
+### How It Works:
+
+* The API receives a **POST** request with customer and appointment details.
+* **CalendarService** processes the request:
+  * Fetches available slots from the repository.
+  * Filters slots based on language, product, and customer rating.
+  * Ensures slots do not overlap with already booked ones.
+* The API returns the filtered list of available slots.
+
+---
 ### **Database & Optimization**
 - The application uses **PostgreSQL** as the database.
 - **EF Core with LINQ queries** is used for querying sales managers and available slots.
@@ -123,6 +133,7 @@ The project implements one main feature: **querying available time slots for app
 
 ### **Validation**
 - **FluentValidation** is used for request validation, ensuring only valid data is processed.
+- Validation of supported Language, Products and Customer Rating are done with regex matching and patterns are provided from appsettings, this increase flexibility for adding more supported Language or Product easily.
 ---
 ### **Limitations**
 
@@ -140,8 +151,9 @@ The project implements one main feature: **querying available time slots for app
       docker build -t enpal-coding-challenge-db .
       docker run --name enpal-coding-challenge-db -p 5432:5432 -d enpal-coding-challenge-db
     ```
-    Once the docker container is up and running, ensure the database can be connected using any DB query tool.
-The default connection string is `postgres://postgres:mypassword123!@localhost:5432/coding-challenge`
+    * Once the docker container is up and running, ensure the database can be connected using any DB query tool.
+The default connection string is `postgres://postgres:mypassword123!@localhost:5432/coding-challenge`.
+    * If connecting to database in some other location is required, please update the value of the key `CodingChallengeDb` in section `ConnectionStrings` in `appsettings.json` file inside `AppointmentBooking.Api` with the details of your database connection.
 
 3. **Running the backend**: Navigate to the `AppointmentBooking.Api` folder inside the project directory (`/AppointmentBooking/AppointmentBooking.Api`) and run the following commands.
     ```shell
@@ -154,13 +166,15 @@ The default connection string is `postgres://postgres:mypassword123!@localhost:5
       npm install
       npm run test
     ```
-   * **To run the tests within the backend application can be run as follows.**
-     * Navigate to `AppointmentBooking.Services.Tests` inside the project folder(`AppointmentBooking/AppointmentBooking.Services.Tests`) and run the following commands.
-       ```shell
-        dotnet test
-       ```
-     * Navigate to `AppointmentBooking.Api.Tests` inside the project folder(`AppointmentBooking/AppointmentBooking.Api.Tests`) and run the following commands.
-       ```shell
-        dotnet test
-       ```
+   NOTE: Additional data could be loaded to the running instance to do extensive testing with large amount of data.
+
+* **To run the tests within the backend application can be run as follows.**
+  * Navigate to `AppointmentBooking.Services.Tests` inside the project folder(`AppointmentBooking/AppointmentBooking.Services.Tests`) and run the following commands.
+    ```shell
+     dotnet test
+    ```
+  * Navigate to `AppointmentBooking.Api.Tests` inside the project folder(`AppointmentBooking/AppointmentBooking.Api.Tests`) and run the following commands.
+    ```shell
+     dotnet test
+    ```
        
