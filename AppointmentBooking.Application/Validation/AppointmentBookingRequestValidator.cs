@@ -26,11 +26,13 @@ public class AppointmentBookingRequestValidator : AbstractValidator<AppointmentB
             .Must(pro => IsSupported(pro, productRegexPattern))
             .WithMessage("Product is not supported");
 
-        RuleFor(r => r.Date).NotEmpty();
+        RuleFor(r => r.Date).NotNull().NotEmpty();
     }
 
     private static bool IsSupported(string input, string? pattern)
     {
+        if(string.IsNullOrWhiteSpace(input))
+            return false;
         return string.IsNullOrEmpty(pattern) || Regex.IsMatch(input, pattern, RegexOptions.IgnoreCase);
     }
 }

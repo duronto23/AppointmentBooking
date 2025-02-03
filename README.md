@@ -140,10 +140,18 @@ The project implements one main feature: **querying available time slots for app
 - Tests that provided withing the `test-app` are added with some others tests in `CalendarControllerTests.cs`.
 
 ---
-
 ### **Validation**
 - **FluentValidation** is used for request validation, ensuring only valid data is processed.
 - Validation of supported Language, Products and Customer Rating are done with regex matching and patterns are provided from appsettings, this increase flexibility for adding more supported Language or Product easily.
+
+---
+### **Exception Handling**
+- A global exception handler has been implemented to manage unexpected errors. I chose to use a custom exception handler class instead of the built-in one to provide greater flexibility in handling exceptions.
+
+---
+### **Logging**
+- The ILogger interface provided by the framework is utilized to log information and errors during execution. In the future, a more advanced logging library(like Serilog) could be integrated to enhance monitoring and diagnostics.
+
 ---
 ### **Limitations**
 

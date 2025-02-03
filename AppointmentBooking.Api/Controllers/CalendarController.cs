@@ -21,6 +21,10 @@ public class CalendarController : ControllerBase
     [HttpPost("query")]
     public async Task<IActionResult> QueryAppointments([FromBody] AppointmentBookingRequest bookingRequest)
     {
-        return Ok(await _calendarService.GetAvailableSlotsAsync(bookingRequest));
+        _logger.LogInformation("Processing request for available slots on {Date} for a {Rating} customer who speaks {Language} language.", bookingRequest.Date.ToShortDateString(), bookingRequest.Rating, bookingRequest.Language);
+
+        var availableSlots = await _calendarService.GetAvailableSlotsAsync(bookingRequest);
+
+        return availableSlots.Any() ? Ok(availableSlots) : NoContent();
     }
 }
