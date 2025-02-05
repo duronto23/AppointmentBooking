@@ -14,13 +14,11 @@ create table if not exists slots (
     sales_manager_id int not null references sales_managers(Id)
 );
 
-CREATE INDEX idx_sales_managers_languages ON sales_managers USING GIN (languages);
-CREATE INDEX idx_sales_managers_ratings ON sales_managers USING GIN (customer_ratings);
-CREATE INDEX idx_sales_managers_products ON sales_managers USING GIN (products);
-
-CREATE INDEX idx_slots_start_date_booked ON slots (start_date, booked);
 CREATE INDEX idx_slots_sales_manager_id ON slots (sales_manager_id);
-CREATE INDEX idx_slots_start_end ON slots (start_date, end_date);
+CREATE INDEX idx_slots_start_date_booked ON slots (start_date, booked);
+CREATE INDEX idx_slots_end_date_booked ON slots (end_date, booked);
+
+CREATE INDEX idx_sales_managers_arrays ON sales_managers USING GIN (languages, customer_ratings, products);
 
 insert into sales_managers (name, languages, products, customer_ratings) values ('Seller 1', '{"German"}', '{"SolarPanels"}', '{"Bronze"}');
 insert into sales_managers (name, languages, products, customer_ratings) values ('Seller 2', '{"German", "English"}', '{"SolarPanels", "Heatpumps"}', '{"Gold","Silver","Bronze"}');
