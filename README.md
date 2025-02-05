@@ -90,6 +90,8 @@ The backend is built using C# and .NET 8 with Entity Framework Core (EF Core) as
 - **Domain Layer** (`Domain`) – Defines core entities
 - **Infrastructure Layer** (`Infrastructure`) – Handles database interactions via AppointmentBookingRepository
 
+**NOTE**: Security features, such as token authorization, have not been implemented yet since this task focuses only on slot fetching. A security mechanism (e.g., JWT) can be introduced when the slot booking feature is added.
+
 ---
 ### **Implementation Details**
 The project implements one main feature: **querying available time slots for appointments** based on sales managers’ availability and customer preferences.

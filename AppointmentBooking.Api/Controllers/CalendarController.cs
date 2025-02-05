@@ -1,6 +1,6 @@
+using Microsoft.AspNetCore.Mvc;
 using AppointmentBooking.Application.DTOs;
 using AppointmentBooking.Application.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentBooking.Api.Controllers;
 
