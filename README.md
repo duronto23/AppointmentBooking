@@ -148,7 +148,7 @@ The project implements one main feature: **querying available time slots for app
 ---
 ### **Testing**
 - The project includes **unit tests** using **NUnit** and **Moq**.
-- Tests that provided withing the `test-app` are added with some others tests in `CalendarControllerTests.cs`.
+- I have added the provided tests from `test-app` into `CalendarControllerTests.cs` for easy execution within the project. Additionally, I have included some extra tests as well.
 
 ---
 ### **Validation**
