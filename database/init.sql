@@ -44,3 +44,30 @@ insert into slots (sales_manager_id, booked, start_date, end_date) values (2, tr
 insert into slots (sales_manager_id, booked, start_date, end_date) values (3, true,  '2024-05-04T10:30Z', '2024-05-04T11:30Z');
 insert into slots (sales_manager_id, booked, start_date, end_date) values (3, false, '2024-05-04T11:00Z', '2024-05-04T12:00Z');
 insert into slots (sales_manager_id, booked, start_date, end_date) values (3, false, '2024-05-04T11:30Z', '2024-05-04T12:30Z');
+
+
+CREATE VIEW vw_available_slots AS
+WITH sorted_slots AS (
+    SELECT
+        s.id,
+        s.start_date,
+        s.end_date,
+        s.booked,
+        s.sales_manager_id,
+        sm.languages,
+        sm.customer_ratings,
+        sm.products,
+        LAG(s.booked) OVER (PARTITION BY s.sales_manager_id ORDER BY s.start_date) AS prev_booked,
+        LAG(s.end_date) OVER (PARTITION BY s.sales_manager_id ORDER BY s.start_date) AS prev_end_date,
+        LEAD(s.booked) OVER (PARTITION BY s.sales_manager_id ORDER BY s.start_date) AS next_booked,
+        LEAD(s.start_date) OVER (PARTITION BY s.sales_manager_id ORDER BY s.start_date) AS next_start_date
+    FROM slots s
+    JOIN sales_managers sm ON s.sales_manager_id = sm.id
+)
+SELECT id, start_date, end_date, sales_manager_id, languages, products, customer_ratings
+FROM sorted_slots
+WHERE (
+    booked = false AND
+    (prev_booked IS NULL OR prev_booked = false OR prev_end_date <= start_date) AND
+    (next_booked IS NULL OR next_booked = false OR next_start_date >= end_date)
+);

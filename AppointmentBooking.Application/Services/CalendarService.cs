@@ -19,20 +19,16 @@ public class CalendarService : ICalendarService
     
     public async Task<IEnumerable<SlotModel>> GetAvailableSlotsAsync(AppointmentBookingRequest request)
     {
-        if (request?.Date == DateTime.MinValue || request?.Language == null || request?.Rating == null || request?.Products == null)
-        {
-            _logger.LogError("Invalid request parameters.");
-            return Array.Empty<SlotModel>();
-        }
-        
         var date = request.Date.GetDateWithUtcKind();
         var language = request.Language.ToLowerInvariant();
         var rating = request.Rating.ToLowerInvariant();
         var products = request.Products.Select(p => p.ToLowerInvariant()).ToArray();
-
-        var slotsByManager = await _appointmentBookingRepository.GetSlotEntitiesAsync(date, language, rating, products);
         
-        return slotsByManager.GroupBy(slot => slot.StartDate).Select(group => new SlotModel
+        var availableSlots = await _appointmentBookingRepository.GetSlotEntitiesAsync(date, language, rating, products);
+
+        _logger.LogInformation($"Total {availableSlots.Count} slots found for {language} language, {rating} rating and products: {string.Join(",", products)}.");
+        
+        return availableSlots.GroupBy(slot => slot).Select(group => new SlotModel
             { StartDate = group.Key.ToStringUtcFormat(), AvailableCount = group.Count() });
     }
 }

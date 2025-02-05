@@ -121,18 +121,29 @@ The project implements one main feature: **querying available time slots for app
 - The application uses **PostgreSQL** as the database as mentioned in requirement.
 - **EF Core with LINQ queries** is used for querying sales managers and available slots.
 - To optimize performance:
+  - Added a view containing **Available Slots**.
   - **Indexes** are added on relevant columns.
   - **GIN indexes** are used for array-based filtering.
 - Details of added indexes are as follows:
 
-|Table	| Index	| Columns            | Type	  | Purpose                                                                   |
-|-------|-------|--------------------|--------|---------------------------------------------------------------------------|
-| sales_managers | 	idx_sales_managers_languages | language           | 	GIN	  | Enables efficient filtering of sales managers based on spoken languages.  |
-|sales_managers   |	idx_sales_managers_ratings	| customer_ratings   | GIN	   | Optimizes searches for sales managers based on internal customer ratings.                        |
-|sales_managers	|idx_sales_managers_products	| products           | GIN	   | Improves queries that filter sales managers by the products they handle.                         |
-|slots|	idx_slots_start_date_booked| start_date, booked | B-tree | 	Speeds up queries that filter available slots (booked = false) on a specific date (start_date). |
-|slots|	idx_slots_sales_manager_id| sales_manager_id   | B-tree | 	Enhances performance for joins between slots and sales_managers using sales_manager_id.       |
-|slots|	idx_slots_start_end| start_date, end_date | B-tree | 	Improves efficiency when checking for slot overlaps by indexing both start_date and end_date. |
+|Table	| Index	| Columns | Type| Purpose|
+|-------|-------|---------|-----|--------|
+| sales_managers | 	idx_sales_managers_arrays | languages, customer_ratings, products | 	GIN	 | Searching across multiple array fields. |
+|slots|	idx_slots_sales_manager_id| sales_manager_id | B-tree | 	Enhances performance for joins between slots and sales_managers using sales_manager_id. |
+|slots|	idx_slots_start_date_booked| start_date, booked | B-tree | 	Speeds up queries that filter available slots on a specific start_date. |
+|slots|	idx_slots_end_date_booked| end_date, booked | B-tree | 	Speeds up queries that filter available slots on a specific end_date. |
+
+**View: vw_available_slots**
+
+| Column Name      | From Table       | Comment                                                  |
+|------------------|------------------|----------------------------------------------------------|
+| id               | slots            | ID of the slot.                                          |
+| start_date       | slots            | Start date and time of the slot                          |
+| end_date         | slots            | End date and time of the slot                            |
+| sales_manager_id | slots            | ID of the sales manager the slot belongs to              |
+| languages        | sales_managers   | List of languages spoken by sales manager                |
+| products         | sales_managers   | List of products the sales manager can work with         |
+| customer_ratings | sales_managers   | List of customer ratings the sales manager can work with |
 
 ---
 ### **Testing**

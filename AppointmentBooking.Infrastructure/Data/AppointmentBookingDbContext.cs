@@ -11,4 +11,5 @@ public class AppointmentBookingDbContext : DbContext
 
     public DbSet<SalesManagerEntity> SalesManagers { get; set; }
     public DbSet<SlotEntity> Slots { get; set; }
+    public DbSet<AvailableSlots> AvailableSlots { get; set; }
 }

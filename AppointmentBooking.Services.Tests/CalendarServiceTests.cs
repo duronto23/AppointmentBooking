@@ -2,7 +2,6 @@
 using NUnit.Framework;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using AppointmentBooking.Domain.Entities;
 using AppointmentBooking.Application.DTOs;
 using AppointmentBooking.Application.Common;
 using AppointmentBooking.Application.Services;
@@ -22,63 +21,38 @@ public class CalendarServiceTests
     }
 
     [Test]
-    public async Task RetrievedSlotsSuccessfully()
-    {
-        //Arrange
-        var date = new DateTime(2024, 05, 03, 00, 00, 00, DateTimeKind.Utc);
-        var products = new[] { "Heatpumps" };
-        var language = "English";
-        var rating = "Silver";
-        var appointmentBookingRepository = new Mock<IAppointmentBookingRepository>();
-        appointmentBookingRepository
-            .Setup(r => r.GetSlotEntitiesAsync(It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string[]>())).Returns(Task.FromResult(new List<SlotEntity>
-            {
-                new() { Id = 3, Booked = false, StartDate = date, EndDate = date.AddHours(1), SalesManagerId = 1 }
-            }));
-
-        // Act
-        var service = new CalendarService(_mockLogger.Object, appointmentBookingRepository.Object);
-        var appointmentBookingRequest = new AppointmentBookingRequest
-            { Date = date, Language = language, Products = products, Rating = rating };
-        var availableSlots = await service.GetAvailableSlotsAsync(appointmentBookingRequest);
-
-        // Assert
-        Assert.That(availableSlots, Is.Not.Null);
-        Assert.That(availableSlots, Is.Not.Empty);
-        Assert.That(availableSlots.First().AvailableCount, Is.EqualTo(1));
-        Assert.That(availableSlots.First().StartDate, Is.EqualTo(date.ToStringUtcFormat()));
-    }
-
-    [Test]
-    [TestCase("./Resources/TestCaseLangNull.json")]
-    [TestCase("./Resources/TestCaseDateNull.json")]
-    [TestCase("./Resources/TestCaseRatingNull.json")]
-    [TestCase("./Resources/TestCaseProductsEmpty.json")]
+    [TestCase("./Resources/TestCase1.json")]
+    [TestCase("./Resources/TestCase2.json")]
+    [TestCase("./Resources/TestCase3.json")]
+    [TestCase("./Resources/TestCase4.json")]
     public async Task ValidateRequest(string contentFilePath)
     {
         //Arrange
         var text = await File.ReadAllTextAsync(contentFilePath);
         var bookingRequest = JsonSerializer.Deserialize<AppointmentBookingRequest>(text);
         var date = bookingRequest.Date.GetDateWithUtcKind();
-        var products = bookingRequest.Products;
-        var language = bookingRequest.Language;
-        var rating = bookingRequest.Rating;
+        var products = bookingRequest.Products.Select(p => p.ToLowerInvariant());
+        var language = bookingRequest.Language.ToLowerInvariant();
+        var rating = bookingRequest.Rating.ToLowerInvariant();
         var appointmentBookingRepository = new Mock<IAppointmentBookingRepository>();
+        appointmentBookingRepository
+            .Setup(r => r.GetSlotEntitiesAsync(It.Is<DateTime>(d => d.Date == date.Date), language, rating,
+                It.Is<string[]>(arr => arr.SequenceEqual(products)))).Returns(Task.FromResult(new List<DateTime> { date }));
 
         // Act
         var service = new CalendarService(_mockLogger.Object, appointmentBookingRepository.Object);
-        var appointmentBookingRequest = new AppointmentBookingRequest
-            { Date = date, Language = language, Products = products, Rating = rating };
-        var availableSlots = await service.GetAvailableSlotsAsync(appointmentBookingRequest);
+        var availableSlots = await service.GetAvailableSlotsAsync(bookingRequest);
 
         // Assert
         Assert.That(availableSlots, Is.Not.Null);
-        Assert.That(availableSlots, Is.Empty);
+        Assert.That(availableSlots, Is.Not.Empty);
+        Assert.That(availableSlots.First().AvailableCount, Is.EqualTo(1));
+        Assert.That(availableSlots.First().StartDate, Is.EqualTo(date.ToStringUtcFormat()));
+        
         _mockLogger.Verify(l => l.Log(
-            LogLevel.Error,
+            LogLevel.Information,
             It.IsAny<EventId>(),
-            It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("Invalid request parameters.")),
+            It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains($"Total 1 slots found for {language} language, {rating} rating and products: {string.Join(",", products)}.")),
             It.IsAny<Exception>(),
             It.IsAny<Func<It.IsAnyType, Exception, string>>()
         ), Times.Once);

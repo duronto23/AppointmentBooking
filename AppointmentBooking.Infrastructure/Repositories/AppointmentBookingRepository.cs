@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using AppointmentBooking.Domain.Entities;
 using AppointmentBooking.Infrastructure.Data;
 using AppointmentBooking.Application.Interfaces;
 
@@ -14,19 +13,17 @@ public class AppointmentBookingRepository : IAppointmentBookingRepository
         _dbContext = dbContext;
     }
 
-    public async Task<List<SlotEntity>> GetSlotEntitiesAsync(DateTime date, string language, string rating, string[] products)
+    public async Task<List<DateTime>> GetSlotEntitiesAsync(DateTime date, string language, string rating, string[] products)
     {
-        var bookedSlots = _dbContext.Slots.Where(slot => slot.StartDate.Date == date && slot.Booked == true);
-
-        var notBookedSlots = _dbContext.Slots.Include(s => s.SalesManager).Where(slot =>
-            slot.StartDate.Date == date && slot.Booked == false && slot.SalesManager.Languages.Any(l => EF.Functions.ILike(l, language)) &&
-            slot.SalesManager.CustomerRatings.Any(r => EF.Functions.ILike(r, rating)) &&
-            products.All(pr => slot.SalesManager.Products.Any(p => EF.Functions.ILike(p, pr))));
-
-        var availableSlots = notBookedSlots.Where(slot =>
-            bookedSlots.Where(bs => bs.SalesManagerId == slot.SalesManagerId).All(bssm =>
-                bssm.EndDate <= slot.StartDate || bssm.StartDate >= slot.EndDate));
+        var startOfDay = date.Date;
+        var endOfDay = startOfDay.AddDays(1);
         
+        var availableSlots = _dbContext.AvailableSlots.Where(slot =>
+            slot.StartDate >= startOfDay && slot.StartDate < endOfDay &&
+            slot.Languages.Any(l => language.Equals(l.ToLower())) &&
+            slot.CustomerRatings.Any(r => rating.Equals(r.ToLower())) &&
+            products.All(pr => slot.Products.Any(p => pr.Equals(p.ToLower())))).Select(s => s.StartDate);
+            
         return await availableSlots.ToListAsync();
     }
 }

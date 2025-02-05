@@ -25,6 +25,6 @@ public class CalendarController : ControllerBase
 
         var availableSlots = await _calendarService.GetAvailableSlotsAsync(bookingRequest);
 
-        return availableSlots.Any() ? Ok(availableSlots) : NoContent();
+        return Ok(availableSlots);
     }
 }

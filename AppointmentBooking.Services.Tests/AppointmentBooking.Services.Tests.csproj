@@ -25,16 +25,16 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Resources\TestCaseDateNull.json">
+      <None Update="Resources\TestCase1.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Resources\TestCaseLangNull.json">
+      <None Update="Resources\TestCase2.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Resources\TestCaseRatingNull.json">
+      <None Update="Resources\TestCase3.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Resources\TestCaseProductsEmpty.json">
+      <None Update="Resources\TestCase4.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
